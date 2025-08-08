@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const Myappointment= () => {
+const Myappointments= () => {
   const [appointments, setAppointments] = useState([]);
   const [error, setError] = useState(null);
 
@@ -51,4 +51,4 @@ const Myappointment= () => {
   );
 };
 
-export default Myappointment;
+export default Myappointments;
