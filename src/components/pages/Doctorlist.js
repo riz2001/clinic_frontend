@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom'
+
 
 // Manual JWT decode function to avoid external dependency
 const jwtDecode = (token) => {
@@ -37,11 +39,12 @@ const DoctorList = () => {
   const [formError, setFormError] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const navigate = useNavigate();
+
+ 
+
   // Navigation placeholder - implement with react-router in real app
-  const navigate = (path) => {
-    console.log('Navigate to:', path);
-    // In real app: window.location.href = path; or use react-router
-  };
+ 
 
   // Get token from localStorage
   const token = typeof localStorage !== 'undefined' ? localStorage.getItem('access_token') : 'demo_token';
@@ -64,13 +67,12 @@ const DoctorList = () => {
   const user = getUserFromToken();
 
   // Handle logout
-  const handleLogout = () => {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem('access_token');
-    }
-    setMessage('Logged out successfully');
-    navigate('/login');
-  };
+const handleLogout = () => {
+  localStorage.removeItem('access_token');
+  navigate('/', { state: { message: 'Logged out successfully' }, replace: true });
+};
+
+
 
   const isTokenExpired = (token) => {
     try {
@@ -82,12 +84,13 @@ const DoctorList = () => {
   };
 
   useEffect(() => {
+    const token = localStorage.getItem('access_token');
     if (!token || isTokenExpired(token)) {
       setMessage('Session expired. Please login again.');
       if (typeof localStorage !== 'undefined') {
         localStorage.removeItem('access_token');
       }
-      navigate('/login');
+       navigate('/', { replace: true });
       return;
     }
 
