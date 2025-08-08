@@ -35,6 +35,7 @@ const DoctorList = () => {
   const [form, setForm] = useState({ patient_name: '', age: '', appointment_date: '' });
   const [message, setMessage] = useState('');
   const [formError, setFormError] = useState('');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Navigation placeholder - implement with react-router in real app
   const navigate = (path) => {
@@ -44,6 +45,32 @@ const DoctorList = () => {
 
   // Get token from localStorage
   const token = typeof localStorage !== 'undefined' ? localStorage.getItem('access_token') : 'demo_token';
+
+  // Get user info from token for navbar
+  const getUserFromToken = () => {
+    try {
+      if (!token || token === 'demo_token') return { name: 'Demo User', role: 'Patient' };
+      const decoded = jwtDecode(token);
+      return {
+        name: decoded.name || decoded.username || 'User',
+        role: decoded.role || 'Patient',
+        email: decoded.email || ''
+      };
+    } catch (err) {
+      return { name: 'User', role: 'Patient' };
+    }
+  };
+
+  const user = getUserFromToken();
+
+  // Handle logout
+  const handleLogout = () => {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('access_token');
+    }
+    setMessage('Logged out successfully');
+    navigate('/login');
+  };
 
   const isTokenExpired = (token) => {
     try {
@@ -79,14 +106,14 @@ const DoctorList = () => {
       .catch(() => setMessage('Unable to load doctors.'));
 
     // Fetch appointments from your API
-    fetch('http://localhost:8000/api/appointments/', { headers })
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch appointments');
-        return res.json();
-      })
-      .then(setAppointments)
-      .catch(() => setMessage('Unable to load appointments.'));
-  }, [navigate, token]);
+   fetch('http://localhost:8000/api/appointments/', { headers })
+    .then((res) => {
+      if (!res.ok) throw new Error('Failed to fetch appointments');
+      return res.json();
+    })
+    .then(setAppointments)
+    .catch(() => setMessage('Unable to load appointments.'));
+}, [token]);
 
   const handleBook = (doctor) => {
     setBookingDoctor(doctor);
@@ -436,6 +463,151 @@ const DoctorList = () => {
       fontWeight: '500',
       cursor: 'pointer',
       transition: 'all 0.3s ease'
+    },
+    // Navbar styles
+    navbar: {
+      background: 'rgba(255, 255, 255, 0.95)',
+      backdropFilter: 'blur(10px)',
+      borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+      padding: '0 20px',
+      position: 'sticky',
+      top: '0',
+      zIndex: '100',
+      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
+    },
+    navContainer: {
+      maxWidth: '1200px',
+      margin: '0 auto',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      height: '70px'
+    },
+    navBrand: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      fontSize: '1.5rem',
+      fontWeight: '700',
+      color: '#1f2937',
+      textDecoration: 'none'
+    },
+    navBrandIcon: {
+      fontSize: '2rem'
+    },
+    navMenu: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '30px',
+      listStyle: 'none',
+      margin: '0',
+      padding: '0'
+    },
+    navItem: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px'
+    },
+    navLink: {
+      color: '#4b5563',
+      textDecoration: 'none',
+      fontWeight: '500',
+      padding: '8px 16px',
+      borderRadius: '8px',
+      transition: 'all 0.3s ease',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px'
+    },
+    navLinkActive: {
+      background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+      color: 'white',
+      boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
+    },
+    userSection: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '15px'
+    },
+    userInfo: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      padding: '8px 16px',
+      background: 'rgba(59, 130, 246, 0.1)',
+      borderRadius: '12px',
+      border: '1px solid rgba(59, 130, 246, 0.2)'
+    },
+    userAvatar: {
+      width: '40px',
+      height: '40px',
+      borderRadius: '50%',
+      background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+      color: 'white',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontWeight: '600',
+      fontSize: '1rem'
+    },
+    userDetails: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-start'
+    },
+    userName: {
+      fontWeight: '600',
+      color: '#1f2937',
+      fontSize: '0.9rem'
+    },
+    userRole: {
+      fontSize: '0.8rem',
+      color: '#6b7280'
+    },
+    logoutBtn: {
+      background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+      color: 'white',
+      border: 'none',
+      padding: '8px 16px',
+      borderRadius: '8px',
+      cursor: 'pointer',
+      fontWeight: '500',
+      transition: 'all 0.3s ease',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '6px'
+    },
+    mobileToggle: {
+      display: 'none',
+      background: 'none',
+      border: 'none',
+      fontSize: '1.5rem',
+      color: '#4b5563',
+      cursor: 'pointer',
+      padding: '8px'
+    },
+    mobileMenu: {
+      display: 'none',
+      position: 'absolute',
+      top: '100%',
+      left: '0',
+      right: '0',
+      background: 'white',
+      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+      borderTop: '1px solid #e5e7eb',
+      padding: '20px'
+    },
+    mobileMenuOpen: {
+      display: 'block'
+    },
+    mobileNavItem: {
+      padding: '15px 0',
+      borderBottom: '1px solid #f3f4f6'
+    },
+    mobileUserSection: {
+      padding: '20px 0',
+      borderTop: '2px solid #f3f4f6',
+      marginTop: '10px'
     }
   };
 
@@ -447,10 +619,88 @@ const DoctorList = () => {
     styles.card.padding = '20px';
     styles.doctorInfo.flexDirection = 'column';
     styles.doctorInfo.gap = '15px';
+    
+    // Mobile navbar styles
+    styles.navMenu.display = 'none';
+    styles.mobileToggle.display = 'block';
+    styles.userSection.display = 'none';
+    
+    if (mobileMenuOpen) {
+      styles.mobileMenu.display = 'block';
+    }
   }
 
   return (
     <div style={styles.container}>
+      {/* Navigation Bar */}
+      <nav style={styles.navbar}>
+        <div style={styles.navContainer}>
+          {/* Brand/Logo */}
+          <div style={styles.navBrand}>
+            <span style={styles.navBrandIcon}>🏥</span>
+            <span>MediCare</span>
+          </div>
+
+          {/* Desktop Navigation */}
+          <ul style={styles.navMenu}>
+            
+          </ul>
+
+          {/* User Section */}
+          <div style={styles.userSection}>
+            <div style={styles.userInfo}>
+            
+            
+            </div>
+            <button 
+              style={styles.logoutBtn}
+              onClick={handleLogout}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-1px)';
+                e.target.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'none';
+                e.target.style.boxShadow = 'none';
+              }}
+            >
+              <span>🚪</span>
+              Logout
+            </button>
+          </div>
+
+          {/* Mobile Menu Toggle */}
+          <button 
+            style={styles.mobileToggle}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            ☰
+          </button>
+        </div>
+
+        {/* Mobile Menu */}
+        <div style={{
+          ...styles.mobileMenu,
+          ...(mobileMenuOpen ? styles.mobileMenuOpen : {})
+        }}>
+         
+         
+          
+         
+            <button 
+              style={{...styles.logoutBtn, marginTop: '15px', width: '100%'}}
+              onClick={() => {
+                setMobileMenuOpen(false);
+                handleLogout();
+              }}
+            >
+              <span>🚪</span>
+              Logout
+            </button>
+            </div>
+         
+      </nav>
+
       <div style={styles.wrapper}>
         {/* Header */}
         <div style={styles.header}>
